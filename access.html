@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Giraffe to the Moon - Access</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
+
+    body {
+      font-family: 'Orbitron', sans-serif;
+      background: linear-gradient(135deg, #0a0a1a 0%, #1c2526 100%);
+      color: #ffffff;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    .glow {
+      text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+    }
+
+    .btn-glow {
+      background: linear-gradient(90deg, #ffd700, #ff8c00);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .btn-glow:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 15px rgba(255, 215, 0, 0.7);
+    }
+
+    .btn-glow:active {
+      transform: scale(0.95);
+    }
+  </style>
+</head>
+<body class="flex justify-center items-center p-4">
+  <div class="w-full max-w-2xl bg-gray-900 bg-opacity-80 rounded-2xl p-6 space-y-6">
+    <!-- Header -->
+    <h1 class="text-3xl md:text-4xl font-bold text-center glow flex items-center justify-center">
+      <span class="mr-2">🦒🚀</span> Mission Control
+    </h1>
+
+    <!-- Character Display -->
+    <div class="text-center">
+      <img id="characterImage" src="assets/giraffe-astronaut.png" alt="Current Character" class="w-32 h-32 mx-auto mb-4 rounded-full border-4 border-yellow-400" />
+      <p class="text-lg">Current Character: <span id="characterName">Astro Giraffe</span></p>
+      <button id="changeCharacterBtn" class="btn-glow text-gray-900 font-bold py-2 px-4 rounded-full mt-2">Change Character</button>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <button id="claimPrizesBtn" class="btn-glow text-gray-900 font-bold py-3 px-6 rounded-full flex items-center justify-center">
+        <span class="mr-2">🏆</span> Claim Prizes
+      </button>
+      <button id="claimAirdropBtn" class="btn-glow text-gray-900 font-bold py-3 px-6 rounded-full flex items-center justify-center">
+        <span class="mr-2">🎁</span> Claim Airdrop
+      </button>
+      <button id="joinZoosBtn" class="btn-glow text-gray-900 font-bold py-3 px-6 rounded-full flex items-center justify-center">
+        <span class="mr-2">🌍</span> Join Zoos
+      </button>
+      <button id="createClanBtn" class="btn-glow text-gray-900 font-bold py-3 px-6 rounded-full flex items-center justify-center">
+        <span class="mr-2">🛡️</span> Create Clan
+      </button>
+    </div>
+
+    <!-- Settings -->
+    <div class="text-center">
+      <button id="settingsBtn" class="text-yellow-400 hover:text-yellow-300 underline flex items-center justify-center mx-auto">
+        <span class="mr-2">⚙️</span> Settings
+      </button>
+    </div>
+
+    <!-- Modal (Hidden by Default) -->
+    <div id="modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden">
+      <div class="bg-gray-800 rounded-xl p-6 w-full max-w-md">
+        <h2 id="modalTitle" class="text-2xl font-bold glow mb-4"></h2>
+        <div id="modalContent" class="space-y-4"></div>
+        <button id="closeModalBtn" class="btn-glow text-gray-900 font-bold py-2 px-4 rounded-full mt-4 w-full">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Sample character data
+    const characters = [
+      { name: "Astro Giraffe", image: "assets/giraffe-astronaut.png" },
+      { name: "Lunar Giraffe", image: "assets/giraffe-lunar.png" },
+      { name: "Star Giraffe", image: "assets/giraffe-star.png" }
+    ];
+
+    // Modal elements
+    const modal = document.getElementById("modal");
+    const modalTitle = document.getElementById("modalTitle");
+    const modalContent = document.getElementById("modalContent");
+    const closeModalBtn = document.getElementById("closeModalBtn");
+
+    // Show modal with content
+    function showModal(title, content) {
+      modalTitle.textContent = title;
+      modalContent.innerHTML = content;
+      modal.classList.remove("hidden");
+    }
+
+    // Hide modal
+    closeModalBtn.addEventListener("click", () => {
+      modal.classList.add("hidden");
+    });
+
+    // Claim Prizes
+    document.getElementById("claimPrizesBtn").addEventListener("click", () => {
+      showModal("Claim Prizes", `
+        <p>Available Prizes:</p>
+        <ul class="list-disc list-inside">
+          <li>Moon Medal (100 Points)</li>
+          <li>Star Badge (200 Points)</li>
+          <li>Rocket Boost (500 Points)</li>
+        </ul>
+        <button class="btn-glow text-gray-900 font-bold py-2 px-4 rounded-full w-full">Claim Now</button>
+      `);
+    });
+
+    // Claim Airdrop
+    document.getElementById("claimAirdropBtn").addEventListener("click", () => {
+      showModal("Claim Airdrop", `
+        <p>Latest Airdrop: 1000 MOON Tokens</p>
+        <p>Eligibility: Active Zoo Member</p>
+        <button class="btn-glow text-gray-900 font-bold py-2 px-4 rounded-full w-full">Claim Airdrop</button>
+      `);
+    });
+
+    // Change Character
+    document.getElementById("changeCharacterBtn").addEventListener("click", () => {
+      const characterOptions = characters.map((char, index) => `
+        <button class="character-option btn-glow text-gray-900 font-bold py-2 px-4 rounded-full w-full mb-2" data-index="${index}">${char.name}</button>
+      `).join("");
+      showModal("Change Character", characterOptions);
+
+      // Add event listeners to character options
+      document.querySelectorAll(".character-option").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const index = btn.dataset.index;
+          document.getElementById("characterName").textContent = characters[index].name;
+          document.getElementById("characterImage").src = characters[index].image;
+          modal.classList.add("hidden");
+        });
+      });
+    });
+
+    // Join Zoos
+    document.getElementById("joinZoosBtn").addEventListener("click", () => {
+      showModal("Join Zoos", `
+        <p>Select a Zoo to Join:</p>
+        <select class="w-full p-2 rounded bg-gray-700 text-white">
+          <option>Lunar Savanna</option>
+          <option>Stellar Plains</option>
+          <option>Cosmic Jungle</option>
+        </select>
+        <button class="btn-glow text-gray-900 font-bold py-2 px-4 rounded-full w-full mt-2">Join Zoo</button>
+      `);
+    });
+
+    // Create Clan
+    document.getElementById("createClanBtn").addEventListener("click", () => {
+      showModal("Create Clan", `
+        <p>Enter Clan Details:</p>
+        <input type="text" placeholder="Clan Name" class="w-full p-2 rounded bg-gray-700 text-white mb-2" />
+        <textarea placeholder="Clan Description" class="w-full p-2 rounded bg-gray-700 text-white mb-2"></textarea>
+        <button class="btn-glow text-gray-900 font-bold py-2 px-4 rounded-full w-full">Create Clan</button>
+      `);
+    });
+
+    // Settings
+    document.getElementById("settingsBtn").addEventListener("click", () => {
+      showModal("Settings", `
+        <p>Adjust Your Preferences:</p>
+        <label class="flex items-center">
+          <input type="checkbox" class="mr-2" /> Notifications
+        </label>
+        <label class="flex items-center">
+          <input type="checkbox" class="mr-2" /> Sound Effects
+        </label>
+        <button class="btn-glow text-gray-900 font-bold py-2 px-4 rounded-full w-full mt-2">Save Settings</button>
+      `);
+    });
+  </script>
+</body>
+</html>

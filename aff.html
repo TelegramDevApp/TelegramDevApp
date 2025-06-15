@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Giraffe to the Moon - Affiliate Link Generator</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
+
+    body {
+      font-family: 'Orbitron', sans-serif;
+      background: linear-gradient(135deg, #0a0a1a 0%, #1c2526 100%);
+      color: #ffffff;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    .glow {
+      text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+    }
+
+    .btn-glow {
+      background: linear-gradient(90deg, #ffd700, #ff8c00);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .btn-glow:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 15px rgba(255, 215, 0, 0.7);
+    }
+
+    .btn-glow:active {
+      transform: scale(0.95);
+    }
+
+    .link-box {
+      background: #1a1a2e;
+      border: 2px solid #ffd700;
+      word-break: break-all;
+    }
+  </style>
+</head>
+<body class="flex justify-center items-center p-4">
+  <div class="w-full max-w-2xl bg-gray-900 bg-opacity-80 rounded-2xl p-6 space-y-6">
+    <!-- Header -->
+    <h1 class="text-3xl md:text-4xl font-bold text-center glow flex items-center justify-center">
+      <span class="mr-2">🦒🚀</span> Affiliate Link Generator
+    </h1>
+
+    <!-- Description -->
+    <p class="text-lg text-center text-gray-300">
+      Spread the word about Giraffe to the Moon and earn rewards! Generate your unique affiliate link below.
+    </p>
+
+    <!-- Affiliate Link Generator -->
+    <div class="text-center space-y-4">
+      <img src="assets/giraffe-rocket.png" alt="Giraffe on Rocket" class="w-32 h-32 mx-auto rounded-full border-4 border-yellow-400" />
+      <button id="generateLinkBtn" class="btn-glow text-gray-900 font-bold py-3 px-6 rounded-full flex items-center justify-center mx-auto">
+        <span class="mr-2">🔗</span> Generate Affiliate Link
+      </button>
+      <div id="linkContainer" class="hidden">
+        <p class="text-lg mb-2">Your Affiliate Link:</p>
+        <div id="affiliateLink" class="link-box p-3 rounded-lg text-yellow-300"></div>
+        <button id="copyLinkBtn" class="btn-glow text-gray-900 font-bold py-2 px-4 rounded-full mt-4 flex items-center justify-center mx-auto">
+          <span class="mr-2">📋</span> Copy Link
+        </button>
+      </div>
+    </div>
+
+    <!-- Back to Mission Control -->
+    <div class="text-center">
+      <a href="access.html" class="text-yellow-400 hover:text-yellow-300 underline flex items-center justify-center">
+        <span class="mr-2">⬅️</span> Back to Mission Control
+      </a>
+    </div>
+  </div>
+
+  <script>
+    // Generate a unique affiliate link
+    function generateUniqueLink() {
+      const baseUrl = "https://t.me/GiraffeToTheMoonBot?start=aff_";
+      const uniqueId = Math.random().toString(36).substring(2, 10) + Date.now().toString(36);
+      return baseUrl + uniqueId;
+    }
+
+    // DOM elements
+    const generateLinkBtn = document.getElementById("generateLinkBtn");
+    const linkContainer = document.getElementById("linkContainer");
+    const affiliateLink = document.getElementById("affiliateLink");
+    const copyLinkBtn = document.getElementById("copyLinkBtn");
+
+    // Generate link on button click
+    generateLinkBtn.addEventListener("click", () => {
+      const link = generateUniqueLink();
+      affiliateLink.textContent = link;
+      linkContainer.classList.remove("hidden");
+    });
+
+    // Copy link to clipboard
+    copyLinkBtn.addEventListener("click", () => {
+      const link = affiliateLink.textContent;
+      navigator.clipboard.writeText(link).then(() => {
+        alert("Link copied to clipboard!");
+      }).catch(() => {
+        alert("Failed to copy link. Please copy it manually.");
+      });
+    });
+
+    // Telegram Web App integration
+    if (window.Telegram?.WebApp) {
+      Telegram.WebApp.ready();
+      Telegram.WebApp.expand();
+    }
+  </script>
+</body>
+</html>

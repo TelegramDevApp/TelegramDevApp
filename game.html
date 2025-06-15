@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Giraffe to the Moon - Space Adventure</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
+
+    body {
+      margin: 0;
+      font-family: 'Orbitron', sans-serif;
+      background: linear-gradient(135deg, #0a0a1a 0%, #1c2526 100%);
+      color: #ffffff;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      overflow: hidden;
+    }
+
+    .game-container {
+      position: relative;
+      text-align: center;
+      padding: 20px;
+      max-width: 800px;
+      width: 100%;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+      text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+    }
+
+    h1::before {
+      content: '🦒🚀 ';
+    }
+
+    #gameCanvas {
+      background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACgAAAAoBAMAAAB+0KVeAAAAG1BMVEX///8AAAD29vb7+/v39/fx8fH09PTg4ODW1tZgrz61AAAACXRSTlMAAQIDBAUGBwgJCQ1r3QAAAElJREFUeF7tkcENgCAMRN8c0Q/Y/QO4gBu4gQv4k+8gZ8z+/4E/AJZAk+wL3gAAAABJRU5ErkJggg==') repeat;
+      border: 2px solid #ffd700;
+      border-radius: 10px;
+      box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
+    }
+
+    .game-over {
+      display: none;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(10, 10, 26, 0.9);
+      padding: 20px;
+      border-radius: 15px;
+      border: 2px solid #ff8c00;
+      text-align: center;
+    }
+
+    .game-over h2 {
+      font-size: 2rem;
+      color: #ffd700;
+      margin-bottom: 1rem;
+    }
+
+    .game-over p {
+      font-size: 1.2rem;
+      color: #e0e0e0;
+      margin-bottom: 1.5rem;
+    }
+
+    .restart-btn {
+      background: linear-gradient(90deg, #ffd700, #ff8c00);
+      color: #0a0a1a;
+      font-size: 1.1rem;
+      font-weight: bold;
+      padding: 12px 24px;
+      border: none;
+      border-radius: 25px;
+      cursor: pointer;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .restart-btn:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 15px rgba(255, 215, 0, 0.7);
+    }
+
+    .restart-btn:active {
+      transform: scale(0.95);
+    }
+
+    .score {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      font-size: 1.2rem;
+      color: #ffd700;
+      text-shadow: 0 0 5px rgba(255, 215, 0, 0.5);
+    }
+
+    .controls {
+      margin-top: 1rem;
+      font-size: 1rem;
+      color: #e0e0e0;
+    }
+
+    @media (max-width: 480px) {
+      h1 {
+        font-size: 2rem;
+      }
+
+      #gameCanvas {
+        width: 100%;
+        height: auto;
+      }
+
+      .game-over h2 {
+        font-size: 1.5rem;
+      }
+
+      .game-over p {
+        font-size: 1rem;
+      }
+
+      .restart-btn {
+        padding: 10px 20px;
+        font-size: 1rem;
+      }
+
+      .score {
+        font-size: 1rem;
+      }
+
+      .controls {
+        font-size: 0.9rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="game-container">
+    <h1>Space Giraffe Adventure</h1>
+    <canvas id="gameCanvas" width="600" height="400"></canvas>
+    <div class="score" id="score">Score: 0</div>
+    <div class="game-over" id="gameOver">
+      <h2>Game Over!</h2>
+      <p>Your Score: <span id="finalScore">0</span></p>
+      <button class="restart-btn" onclick="restartGame()">Restart</button>
+    </div>
+    <div class="controls">
+      Controls: Use Arrow Keys or Swipe to move the giraffe. Avoid asteroids!
+    </div>
+  </div>
+  <script>
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    const scoreDisplay = document.getElementById('score');
+    const gameOver = document.getElementById('gameOver');
+    const finalScoreDisplay = document.getElementById('finalScore');
+
+    // Placeholder images (replace with your assets)
+    giraffeImg.src = 'assets/giraffe-space.png'; // Custom giraffe sprite
+asteroidImg.src = 'assets/asteroid.png'; // From Space Pack
+  
+
+    // Game variables
+    let player = {
+      x: canvas.width / 2 - 25,
+      y: canvas.height - 2 - 50,
+      width: 50,
+      height: 50,
+      speed: 5,
+      dx: 0,
+      dy: 0
+    };
+
+    let asteroids = [];
+    let score = 0;
+    let gameRunning = false;
+    let lastTime = 0;
+    let asteroidSpawnTime = 0;
+
+    // Controls
+    let keys = {};
+    let touchStart = null;
+
+    document.addEventListener('keydown', (e) => {
+      keys[ee.key] = true;
+    });
+
+    document.addEventListener('keyup', (e) => {
+      keys[e.key] = false;
+    });
+
+    canvas.addEventListener('touchstart', (e) => {
+      e.preventDefault();
+      touchStart = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+    });
+
+    canvas.addEventListener('touchmove', (e) => {
+      e.preventDefault();
+      if (touchStart) {
+        let touch = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+        let dx = touch.x - touchStart.x;
+        let dy = touch.y - touchStart.y;
+        player.dx = dx / 20;
+        player.dy = dy / 20;
+        touchStart = touch;
+      }
+    });
+
+    canvas.addEventListener('touchend', () => {
+      touchStart = null;
+      player.dx = 0;
+      player.dy = 0;
+    });
+
+    function spawnAsteroid() {
+      const size = Math.random() * 20 + 10;
+      asteroids.push({
+        x: Math.random() * (canvas.width - size),
+        y: -size,
+        width: size,
+        height: size,
+        speed: Math.random() * 3 + 1
+      });
+    }
+
+    function update(deltaTime) {
+      if (!gameRunning) return;
+
+      // Update player movement
+      player.dx = 0;
+      player.dy = 0;
+      if (keys['ArrowLeft']) player.dx = -player.speed;
+      if (keys['ArrowRight']) player.dx = player.speed;
+      if (keys['ArrowUp']) player.dy = -player.speed;
+      if (keys['ArrowDown']) player.dy = player.speed;
+
+      player.x += player.dx;
+      player.y += player.dy;
+
+      // Keep player in bounds
+      player.x = Math.max(0, Math.min(canvas.width - player.width, player.x));
+      player.y = Math.max(0, Math.min(canvas.height - player.height, player.y));
+
+      // Update asteroids
+      asteroids.forEach((asteroid, idx) => {
+        asteroid.y += asteroid.speed;
+        if (asteroid.y > canvas.height) {
+          asteroids.splice(idx, 1);
+        }
+      });
+
+      // Spawn new asteroids
+      asteroidSpawnTime += deltaTime;
+      if (asteroidSpawnTime > 1000) {
+        spawnAsteroid();
+        asteroidSpawnTime = 0;
+      }
+
+      // Check collisions
+      for (let asteroid of asteroids) {
+        if (
+          player.x < asteroid.x + asteroid.width &&
+          player.x + player.width > asteroid.x &&
+          player.y < asteroid.y + asteroid.height &&
+          player.y + player.height > asteroid.y
+        ) {
+          endGame();
+          return;
+        }
+      }
+
+      // Update score
+      score += deltaTime / 1000;
+      scoreDisplay.textContent = `Score: ${Math.floor(score)}`;
+    }
+
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(giraffeImg, player.x, player.y, player.width, player.height);
+      asteroids.forEach((asteroid) => {
+        ctx.drawImage(asteroidImg, asteroid.x, asteroid.y, asteroid.width, asteroid.height);
+      });
+    }
+
+    function gameLoop(timestamp) {
+      if (!lastTime) lastTime = timestamp;
+      const deltaTime = timestamp - lastTime;
+      lastTime = timestamp;
+
+      update(deltaTime);
+      draw();
+
+      if (gameRunning) requestAnimationFrame(gameLoop);
+    }
+
+    function startGame() {
+      player.x = canvas.width / 2 - 25;
+      player.y = canvas.height - 50;
+      asteroids = [];
+      score = 0;
+      scoreDisplay.textContent = `Score: 0`;
+      gameOver.style.display = 'none';
+      gameRunning = true;
+      lastTime = 0;
+      asteroidSpawnTime = 0;
+      requestAnimationFrame(gameLoop);
+    }
+
+    function endGame() {
+      gameRunning = false;
+      gameOver.style.display = 'block';
+      finalScoreDisplay.textContent = Math.floor(score);
+    }
+
+    function restartGame() {
+      startGame();
+    }
+
+    // Start the game when images are loaded
+    Promise.all([
+      new Promise((resolve) => { giraffeImg.onload = resolve; }),
+      new Promise((resolve) => { asteroidImg.onload = resolve; })
+    ]).then(() => {
+      startGame();
+    });
+  </script>
+</body>
+</html>
